@@ -10,15 +10,25 @@ window.addEventListener("load", function(event){
     const linebutton = this.document.getElementById("line");
 
     // add event listeners to buttons
-    
+
+    rectanglebutton.addEventListener("click", (e)=>{
+        Rectangle.draw();
+    });
+
+    circlebutton.addEventListener("click", (e)=>{
+        Circle.draw();
+    }); 
+    trianglebutton.addEventListener("click",(e)=>{
+        Triangle.draw(); 
+    });
+    linebutton.addEventListener("click", (e)=>{
+        Line.draw();
+    })
 
     // triangle, circle, rectangle, line, brush
     class Shape {
         constructor(colour) {
             this.colour = colour;
-        }
-        draw() {
-            
         }
     }
 
@@ -30,9 +40,9 @@ window.addEventListener("load", function(event){
             this.height = height;
             super(colour);
         }
-        drawRect() {
+        draw() {
             ctx.fillStyle = colour;
-            ctx.strokeRect(this.x, this.y, width, height);
+            ctx.fillRect(this.x, this.y, this.width, this.height); 
         }
     }
 
@@ -43,19 +53,31 @@ window.addEventListener("load", function(event){
             this.radius = radius;
             super(colour);
         }
-        drawCircle() {
-            ctx.fillStyle = colour; 
+        draw() {
+            ctx.beginPath();
+            ctx.fillStyle = colour;
+            ctx.arc(this.x, this.y, 0, this.radius, Math.PI*2);
+            ctx.closePath();
         }
     }
 
     class Line extends Shape {
-        constructor(x, y, colour) {
-            this.x = x;
-            this.y = y;
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour) {
+            this.xStart = xStart;
+            this.yStart = yStart;
+            this.xEnd = xEnd;
+            this.yEnd = yEnd;
+            this.strokeWidth = strokeWidth;
+
             super(colour);
         }
-        drawLine() {
-            ctx.strokeStyle = colour;
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.xStart, this.yStart);
+            ctx.lineTo(this.xEnd, this.yEnd);
+            ctx.strokeWidth(this.strokeWidth);
+            ctx.strokeStyle (colour);
+            ctx.stroke(); 
         }
     }
 
@@ -63,6 +85,7 @@ window.addEventListener("load", function(event){
         constructor(brushShape) {
             this.brushShape = brushShape;
         }
+
     }
 
 })
