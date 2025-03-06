@@ -20,43 +20,34 @@ window.addEventListener("load", function(event){
     colour.addEventListener("change", (e)=>{
         colourSelected = colour.value; 
     })
-    shapeButtons.addEventListener("click", (e)=>{
-        if (shapeSelected === "rectangle"){
-            c.addEventListener("click", (e)=>{
+    shapeButtons.forEach(button=>{
+        button.addEventListener("click", (e)=>{
+            if (e.target.id === "rectangle"){
+                c.addEventListener("click", (e)=>{
+                    let rectangle = new Rectangle(10, 10, 10, 10, colourSelected);
+                    rectangle.draw();
+                });
+            }
+            if (e.target.id === "triangle"){
+                let triangle = new Triangle (10, 10, 10, colourSelected); 
+                triangle.draw();
                 
-            })
-        }
-        if (shapeSelected === "triangle"){
-
-        }
-        if (shapeSelected === "circle"){}
-
-        if (shapeSelected === "line"){
-        }
-
-        
+            }
+            if (e.target.id === "circle"){
+                let circle = new Circle();
+                circle.draw();
+                
+            }
+            if (e.target.id === "line"){
+                let line = new Line (); 
+                line.draw();
+            }
+        })
     })
 
     // add event listeners to buttons
 
-    rectanglebutton.addEventListener("click", (e)=>{
-        let rectangle = new Rectangle(10, 10, 10, 10, colourSelected);
-        rectangle.draw();
-        shapeSelected = "rectangle"; 
-    });
-
-    circlebutton.addEventListener("click", (e)=>{
-        Circle.draw();
-        shapeSelected = "circle"
-    }); 
-    trianglebutton.addEventListener("click",(e)=>{
-        Triangle.draw(); 
-        shapeSelected = "triangle"
-    });
-    linebutton.addEventListener("click", (e)=>{
-        Line.draw();
-        shapeSelected = "line"; 
-    })
+ 
 
     // triangle, circle, rectangle, line, brush
     class Shape{
