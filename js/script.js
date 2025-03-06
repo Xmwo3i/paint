@@ -13,6 +13,8 @@ window.addEventListener("load", function(event){
 
     let colourSelected;
     let shapeSelected; 
+    let sizeX;
+    let sizeY; 
 
 
     // add event listener to the canvas
@@ -21,8 +23,19 @@ window.addEventListener("load", function(event){
     });
     shapeButtons.forEach(button=>{
         button.addEventListener("click", (e)=>{
-            shapeSelected = e.target.id; 
+            shapeSelected = e.target.id;
         });
+    });
+    c.addEventListener("mousedown", (e)=>{
+        sizeX = e.offsetX;
+        sizeY = e.offsetY; 
+    });
+    c.addEventListener("mouseup" , (e)=>{
+        sizeX = Math.abs(sizeX - e.offsetX);
+        sizeY = Math.abs(sizeY - e.offsetY); 
+     
+        console.log(sizeX);
+        console.log(sizeY);
     });
 
     c.addEventListener("click", (e)=>{
@@ -31,7 +44,7 @@ window.addEventListener("load", function(event){
         let yCoordinate = e.offsetY;
 
         if (shapeSelected === "rectangle"){
-            let rectangle = new Rectangle(xCoordinate, yCoordinate, 10, 10, colourSelected);
+            let rectangle = new Rectangle(xCoordinate, yCoordinate, sizeX, sizeY, colourSelected);
             rectangle.draw();
         }
         if (shapeSelected === "triangle"){
