@@ -47,7 +47,7 @@ window.addEventListener("load", function(event){
             this.height = height;
         }
         draw() {
-            ctx.fillStyle = colour;
+            ctx.fillStyle = this.colour;
             ctx.fillRect(this.x, this.y, this.width, this.height); 
         }
     }
@@ -61,7 +61,7 @@ window.addEventListener("load", function(event){
         }
         draw() {
             ctx.beginPath();
-            ctx.fillStyle = colour;
+            ctx.fillStyle = this.colour;
             ctx.arc(this.x, this.y, 0, this.radius, Math.PI*2);
             ctx.closePath();
         }
