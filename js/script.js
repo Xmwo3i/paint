@@ -9,10 +9,16 @@ window.addEventListener("load", function(event){
     const circlebutton = this.document.getElementById("circle");
     const linebutton = this.document.getElementById("line");
 
+    // add event listener to the canvas
+    c.addEventListener("click", function(event){
+
+    })
+
     // add event listeners to buttons
 
     rectanglebutton.addEventListener("click", (e)=>{
-        Rectangle.draw();
+        let rectangle = new Rectangle(10, 10, 10, 10, "black");
+        rectangle.draw();
     });
 
     circlebutton.addEventListener("click", (e)=>{
@@ -34,11 +40,11 @@ window.addEventListener("load", function(event){
 
     class Rectangle extends Shape {
         constructor(x, y, width, height, colour) {
+            super(colour);
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
-            super(colour);
         }
         draw() {
             ctx.fillStyle = colour;
