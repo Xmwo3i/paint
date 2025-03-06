@@ -9,41 +9,45 @@ window.addEventListener("load", function(event){
     const circlebutton = this.document.getElementById("circle");
     const linebutton = this.document.getElementById("line");
     const colour = this.document.getElementById("colour");
-    let colourSelected;
     const shapeButtons = this.document.querySelectorAll("button"); 
+
+    let colourSelected;
     let shapeSelected; 
 
-    // add event listener to the canvas
-    c.addEventListener("click", function(event){
 
-    })
+    // add event listener to the canvas
     colour.addEventListener("change", (e)=>{
-        colourSelected = colour.value; 
-    })
+        colourSelected = e.target.value; 
+    });
     shapeButtons.forEach(button=>{
         button.addEventListener("click", (e)=>{
-            if (e.target.id === "rectangle"){
-                c.addEventListener("click", (e)=>{
-                    let rectangle = new Rectangle(10, 10, 10, 10, colourSelected);
-                    rectangle.draw();
-                });
-            }
-            if (e.target.id === "triangle"){
-                let triangle = new Triangle (10, 10, 10, colourSelected); 
-                triangle.draw();
-                
-            }
-            if (e.target.id === "circle"){
-                let circle = new Circle();
-                circle.draw();
-                
-            }
-            if (e.target.id === "line"){
-                let line = new Line (); 
-                line.draw();
-            }
-        })
-    })
+            shapeSelected = e.target.id; 
+        });
+    });
+
+    c.addEventListener("click", (e)=>{
+        
+        let xCoordinate = e.offsetX;
+        let yCoordinate = e.offsetY;
+
+        if (shapeSelected === "rectangle"){
+            let rectangle = new Rectangle(xCoordinate, yCoordinate, 10, 10, colourSelected);
+            rectangle.draw();
+        }
+        if (shapeSelected === "triangle"){
+            let triangle = new Triangle(); 
+            triangle.draw();
+        }
+        if (shapeSelected === "circle"){
+            let circle = new Circle(xCoordinate, yCoordinate, 5, colourSelected); 
+            circle.draw();
+        }
+        if (shapeSelected === "line"){
+            let line = new Line(); 
+            line.draw();
+        }
+
+    });
 
     // add event listeners to buttons
 
@@ -80,8 +84,9 @@ window.addEventListener("load", function(event){
         draw() {
             ctx.beginPath();
             ctx.fillStyle = this.colour;
-            ctx.arc(this.x, this.y, 0, this.radius, Math.PI*2);
+            ctx.arc(this.x, this.y, this.radius,0, Math.PI*2);
             ctx.closePath();
+            ctx.fill();
         }
     }
 
