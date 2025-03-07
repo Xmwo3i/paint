@@ -1,4 +1,4 @@
-window.addEventListener("load", function(event){
+window.addEventListener("load", function (event) {
     // get context from canvas
     const c = this.document.getElementById("canvas");
     let ctx = c.getContext("2d");
@@ -9,54 +9,121 @@ window.addEventListener("load", function(event){
     const circlebutton = this.document.getElementById("circle");
     const linebutton = this.document.getElementById("line");
     const colour = this.document.getElementById("colour");
-    const shapeButtons = this.document.querySelectorAll("button"); 
+    const shapeButtons = this.document.querySelectorAll("button");
 
     let colourSelected;
-    let shapeSelected; 
+    let shapeSelected;
     let sizeX;
-    let sizeY; 
+    let sizeY;
+    let xCoordinate;
+    let yCoordinate;
+    let isDrawing = false;
+    let currentRectangle = null;
+    let startX, startY;
+    let endX, endY;
+    let prevX, prevY, prevWidth, prevHeight; 
+
 
 
     // add event listener to the canvas
-    colour.addEventListener("change", (e)=>{
-        colourSelected = e.target.value; 
+    colour.addEventListener("change", (e) => {
+        colourSelected = e.target.value;
     });
-    shapeButtons.forEach(button=>{
-        button.addEventListener("click", (e)=>{
+    shapeButtons.forEach(button => {
+        button.addEventListener("click", (e) => {
             shapeSelected = e.target.id;
         });
     });
-    c.addEventListener("mousedown", (e)=>{
-        sizeX = e.offsetX;
-        sizeY = e.offsetY; 
-    });
-    c.addEventListener("mouseup" , (e)=>{
-        sizeX = Math.abs(sizeX - e.offsetX);
-        sizeY = Math.abs(sizeY - e.offsetY); 
-     
-        console.log(sizeX);
-        console.log(sizeY);
-    });
+    c.addEventListener("mousedown", (e) => {
+        //rectangle
+        if (shapeSelected === "rectangle") {
 
-    c.addEventListener("click", (e)=>{
-        
-        let xCoordinate = e.offsetX;
-        let yCoordinate = e.offsetY;
+            isDrawing = true;
 
-        if (shapeSelected === "rectangle"){
-            let rectangle = new Rectangle(xCoordinate, yCoordinate, sizeX, sizeY, colourSelected);
-            rectangle.draw();
+            startX = e.offsetX;
+            startY = e.offsetY;
+
+            //create new rec 
+            currentRectangle = new Rectangle(startX, startY, 0, 0, colourSelected);
+
+            //previous rectangle 
+            prevX = startX; 
+            prevY = startY; 
+            prevWidth = 0; 
+            prevHeight = 0; 
         }
-        if (shapeSelected === "triangle"){
-            let triangle = new Triangle(); 
+    });
+
+    c.addEventListener("mousemove", (e) => {
+        // rectangle 
+        if (isDrawing && currentRectangle) {
+            const currentX = e.offsetX;
+            const currentY = e.offsetY;
+
+            // width and height 
+            sizeX = currentX - startX;
+            sizeY = currentY - startY;
+
+            currentRectangle.width = sizeX;
+            currentRectangle.height = sizeY;
+
+            // clear the canvas and redraw new one
+            ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
+            currentRectangle.draw();
+
+            // prev rectangle
+            prevX = currentRectangle.x;
+            prevY = currentRectangle.y;
+            prevWidth = currentRectangle.width;
+            prevHeight = currentRectangle.height;
+
+        }
+    });
+    c.addEventListener("mouseup", (e) => {
+        //rectangle
+        if (isDrawing && currentRectangle) {
+            isDrawing = false;
+
+            endX = e.offsetX;
+            endY = e.offsetY;
+
+            sizeX = endX - startX;
+            sizeY = endY - startY;
+
+            console.log(sizeX);
+            console.log(sizeY);
+
+
+            currentRectangle.width = sizeX;
+            currentRectangle.height = sizeY;
+
+            ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
+
+            currentRectangle.draw();
+
+            currentRectangle = null;
+        }
+
+
+
+    });
+
+    c.addEventListener("click", (e) => {
+
+        xCoordinate = e.offsetX;
+        yCoordinate = e.offsetY;
+
+
+        if (shapeSelected === "triangle") {
+            let triangle = new Triangle();
             triangle.draw();
         }
-        if (shapeSelected === "circle"){
-            let circle = new Circle(xCoordinate, yCoordinate, 5, colourSelected); 
+        if (shapeSelected === "circle") {
+            let circle = new Circle(xCoordinate, yCoordinate, 5, colourSelected);
             circle.draw();
         }
-        if (shapeSelected === "line"){
-            let line = new Line(); 
+        if (shapeSelected === "line") {
+            let line = new Line();
             line.draw();
         }
 
@@ -64,11 +131,11 @@ window.addEventListener("load", function(event){
 
     // add event listeners to buttons
 
- 
+
 
     // triangle, circle, rectangle, line, brush
-    class Shape{
-        constructor(colour){
+    class Shape {
+        constructor(colour) {
             this.colour = colour;
         }
     }
@@ -83,11 +150,11 @@ window.addEventListener("load", function(event){
         }
         draw() {
             ctx.fillStyle = this.colour;
-            ctx.fillRect(this.x, this.y, this.width, this.height); 
+            ctx.fillRect(this.x, this.y, this.width, this.height);
         }
     }
 
-    class Circle extends Shape  {
+    class Circle extends Shape {
         constructor(x, y, radius, colour) {
             super(colour);
             this.x = x;
@@ -97,7 +164,7 @@ window.addEventListener("load", function(event){
         draw() {
             ctx.beginPath();
             ctx.fillStyle = this.colour;
-            ctx.arc(this.x, this.y, this.radius,0, Math.PI*2);
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.closePath();
             ctx.fill();
         }
@@ -118,8 +185,8 @@ window.addEventListener("load", function(event){
             ctx.moveTo(this.xStart, this.yStart);
             ctx.lineTo(this.xEnd, this.yEnd);
             ctx.strokeWidth(this.strokeWidth);
-            ctx.strokeStyle (colour);
-            ctx.stroke(); 
+            ctx.strokeStyle(colour);
+            ctx.stroke();
         }
     }
 
