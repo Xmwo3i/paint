@@ -27,10 +27,135 @@ window.addEventListener("load", function (event) {
     let endX, endY;
     let shapesArray = [];
 
+    // triangle, circle, rectangle, line, brush
+    class Shape {
+        constructor(colour) {
+            this.colour = colour;
+        }
+    }
+
+    class Rectangle extends Shape {
+        constructor(x, y, width, height, colour, type="rectangle") {
+            super(colour);
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.type = type;
+        }
+        draw() {
+            ctx.fillStyle = this.colour;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+
+    class Circle extends Shape {
+        constructor(x, y, radius, colour, type="circle") {
+            super(colour);
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.type = type;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.fillStyle = this.colour;
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    class Triangle extends Shape {
+        constructor(x, y, width, height, colour, type="triangle") {
+            super(colour);
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.type = type;
+        }
+        draw() {
+            ctx.fillStyle = this.colour;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - this.width / 2, this.y + this.height);
+            ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    class Line extends Shape {
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour, type="line") {
+            super(colour);
+            this.xStart = xStart;
+            this.yStart = yStart;
+            this.xEnd = xEnd;
+            this.yEnd = yEnd;
+            this.strokeWidth = strokeWidth;
+            this.type = type;
+
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.xStart, this.yStart);
+            ctx.lineTo(this.xEnd, this.yEnd);
+            ctx.strokeWidth = this.strokeWidth;
+            ctx.strokeStyle = this.colour;
+            ctx.stroke();
+        }
+    }
+
+    class Brush {
+        constructor(brushShape) {
+            this.brushShape = brushShape;
+        }
+
+    }
+
     if (this.localStorage.getItem("shapes")) {
-        shapesArray= JSON.parse(this.localStorage.getItem("shapes"));
-        console.log(shapesArray);
-        previousLayers(); 
+        let stringShapesArray= JSON.parse(this.localStorage.getItem("shapes"));
+        for (let i=0; i<stringShapesArray.length; i++) {
+            console.log(stringShapesArray[i]);
+            if (stringShapesArray[i].type==="rectangle") { // height, width, x, y
+                let tempX = stringShapesArray[i].x;
+                let tempY = stringShapesArray[i].y;
+                let tempHeight = stringShapesArray[i].height;
+                let tempWidth = stringShapesArray[i].width;
+                let tempColour = stringShapesArray[i].colour;
+                let tempRectangle = new Rectangle(tempX, tempY, tempWidth, tempHeight, tempColour);
+                shapesArray.push(tempRectangle);
+            }
+            else if (stringShapesArray[i].type==="circle") {
+                let tempX = stringShapesArray[i].x;
+                let tempY = stringShapesArray[i].y;
+                let tempRadius = stringShapesArray[i].radius;
+                let tempColour = stringShapesArray[i].colour;
+                let tempCircle = new Circle(tempX, tempY, tempRadius, tempColour);
+                shapesArray.push(tempCircle);
+            }
+            else if (stringShapesArray[i].type==="triangle") {
+                let tempX = stringShapesArray[i].x;
+                let tempY = stringShapesArray[i].y;
+                let tempHeight = stringShapesArray[i].height;
+                let tempWidth = stringShapesArray[i].width;
+                let tempColour = stringShapesArray[i].colour;
+                let tempTri = new Triangle(tempX, tempY, tempWidth, tempHeight, tempColour);
+                shapesArray.push(tempTri);
+            }
+            else if (stringShapesArray[i].type==="line") {
+                let tempXstart = stringShapesArray[i].xStart;
+                let tempYstart = stringShapesArray[i].yStart;
+                let tempXend = stringShapesArray[i].xEnd;
+                let tempYend = stringShapesArray[i].yEnd;
+                let tempStroke = stringShapesArray[i].strokeWidth;
+                let tempColour = stringShapesArray[i].colour;
+                let tempLine = new Line(tempXstart, tempYstart, tempXend, tempYend, tempStroke, tempColour);
+                shapesArray.push(tempLine);
+            }
+        }
+        previousLayers();
     }
 
 
@@ -128,6 +253,7 @@ window.addEventListener("load", function (event) {
         }
     });
     c.addEventListener("mouseup", (e) => {
+        console.log(shapesArray);
         endX = e.offsetX;
         endY = e.offsetY;
 
@@ -180,88 +306,7 @@ window.addEventListener("load", function (event) {
 
 
 
-    // triangle, circle, rectangle, line, brush
-    class Shape {
-        constructor(colour) {
-            this.colour = colour;
-        }
-    }
-
-    class Rectangle extends Shape {
-        constructor(x, y, width, height, colour) {
-            super(colour);
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-        draw() {
-            ctx.fillStyle = this.colour;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-
-    class Circle extends Shape {
-        constructor(x, y, radius, colour) {
-            super(colour);
-            this.x = x;
-            this.y = y;
-            this.radius = radius;
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.fillStyle = this.colour;
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.fill();
-        }
-    }
-
-    class Triangle extends Shape {
-        constructor(x, y, width, height, colour) {
-            super(colour);
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-        draw() {
-            ctx.fillStyle = this.colour;
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - this.width / 2, this.y + this.height);
-            ctx.lineTo(this.x + this.width / 2, this.y + this.height);
-            ctx.closePath();
-            ctx.fill();
-        }
-    }
-
-    class Line extends Shape {
-        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour) {
-            super(colour);
-            this.xStart = xStart;
-            this.yStart = yStart;
-            this.xEnd = xEnd;
-            this.yEnd = yEnd;
-            this.strokeWidth = strokeWidth;
-
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.moveTo(this.xStart, this.yStart);
-            ctx.lineTo(this.xEnd, this.yEnd);
-            ctx.strokeWidth = this.strokeWidth;
-            ctx.strokeStyle = this.colour;
-            ctx.stroke();
-        }
-    }
-
-    class Brush {
-        constructor(brushShape) {
-            this.brushShape = brushShape;
-        }
-
-    }
+    
 
     //local storage
     // function storage() {
