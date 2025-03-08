@@ -1,4 +1,5 @@
 window.addEventListener("load", function (event) {
+
     // get context from canvas
     const c = this.document.getElementById("canvas");
     let ctx = c.getContext("2d");
@@ -10,7 +11,7 @@ window.addEventListener("load", function (event) {
     const linebutton = this.document.getElementById("line");
     const colour = this.document.getElementById("colour");
     const shapeButtons = this.document.querySelectorAll("button");
-    const clear = this.document.getElementById("clear"); 
+    const clear = this.document.getElementById("clear");
     const undo = this.document.getElementById("undo");
 
     let colourSelected;
@@ -21,20 +22,28 @@ window.addEventListener("load", function (event) {
     let currentRectangle = null;
     let currentCircle;
     let currentTriangle;
+    let currentLine;
     let startX, startY;
     let endX, endY;
     let shapesArray = [];
 
+    if (this.localStorage.getItem("shapes")) {
+        shapesArray= JSON.parse(this.localStorage.getItem("shapes"));
+        console.log(shapesArray);
+        previousLayers(); 
+    }
+
+
     //add event listener to buttons 
-    clear.addEventListener("click", (e)=>{
-        shapesArray = []; 
-        ctx.clearRect(0 ,0 , c.width, c.height);
+    clear.addEventListener("click", (e) => {
+        shapesArray = [];
+        ctx.clearRect(0, 0, c.width, c.height);
 
     });
-    undo.addEventListener("click", (e)=>{
+    undo.addEventListener("click", (e) => {
         shapesArray.pop();
-        ctx.clearRect(0 ,0 , c.width, c.height);
-        
+        ctx.clearRect(0, 0, c.width, c.height);
+
         previousLayers();
     })
 
@@ -66,6 +75,10 @@ window.addEventListener("load", function (event) {
             //testing traingle
             currentTriangle = new Triangle(startX, startY, 0, 0, colourSelected);
         }
+        else if (shapeSelected === "line") {
+            // create new Line 
+            currentLine = new Line(startX, startY, 0, 0, 5, colourSelected);
+        }
     });
 
     c.addEventListener("mousemove", (e) => {
@@ -75,8 +88,8 @@ window.addEventListener("load", function (event) {
         sizeX = currentX - startX;
         sizeY = currentY - startY;
 
-        
-        if (isDrawing){
+
+        if (isDrawing) {
             // rectangle 
             if (currentRectangle) {
                 currentRectangle.width = sizeX;
@@ -96,12 +109,21 @@ window.addEventListener("load", function (event) {
             }
             //triangle
             else if (currentTriangle) {
-                currentTriangle.width = sizeX*2;
+                currentTriangle.width = sizeX * 2;
                 currentTriangle.height = sizeY;
                 // clear the canvas and redraw new one
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
                 currentTriangle.draw();
+            }
+            // line 
+            else if (currentLine) {
+                currentLine.xEnd = currentX;
+                currentLine.yEnd = currentY;
+
+                ctx.clearRect(0, 0, c.width, c.height);
+                previousLayers();
+                currentLine.draw();
             }
         }
     });
@@ -121,25 +143,37 @@ window.addEventListener("load", function (event) {
                 currentRectangle = null;
             }
             //circle 
-            if(currentCircle){
+            else if (currentCircle) {
                 currentCircle.draw();
                 shapesArray.push(currentCircle);
-                currentCircle = null; 
+                currentCircle = null;
+
             }
             //triangle
-            if (currentTriangle) {
+            else if (currentTriangle) {
                 currentTriangle.draw();
                 shapesArray.push(currentTriangle);
                 currentTriangle = null;
+
+            }
+            // line 
+            else if (currentLine) {
+                currentLine.draw();
+                shapesArray.push(currentLine);
+                currentLine = null;
+
             }
         }
+
+        this.localStorage.setItem("shapes", JSON.stringify(shapesArray));
+
+
     });
 
     // add event listeners to buttons
 
     function previousLayers() {
         for (let i = 0; i < shapesArray.length; i++) {
-            console.log(shapesArray[i]);
             shapesArray[i].draw();
         }
     }
@@ -195,8 +229,8 @@ window.addEventListener("load", function (event) {
             ctx.fillStyle = this.colour;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x-this.width/2, this.y+this.height);
-            ctx.lineTo(this.x+this.width/2, this.y+this.height);
+            ctx.lineTo(this.x - this.width / 2, this.y + this.height);
+            ctx.lineTo(this.x + this.width / 2, this.y + this.height);
             ctx.closePath();
             ctx.fill();
         }
@@ -216,8 +250,8 @@ window.addEventListener("load", function (event) {
             ctx.beginPath();
             ctx.moveTo(this.xStart, this.yStart);
             ctx.lineTo(this.xEnd, this.yEnd);
-            ctx.strokeWidth(this.strokeWidth);
-            ctx.strokeStyle(colour);
+            ctx.strokeWidth = this.strokeWidth;
+            ctx.strokeStyle = this.colour;
             ctx.stroke();
         }
     }
@@ -229,4 +263,18 @@ window.addEventListener("load", function (event) {
 
     }
 
-})
+    //local storage
+    // function storage() {
+    //     let storage = JSON.stringify(shapesArray);
+    //     this.localStorage.this.shape = storage;
+    // }
+
+    // function retrieved() {
+    //     //retrieved 
+    //     let retrieved = JSON.parse(this.localStorage.storage);
+    //     console.log(retrieved);
+    //     shapesArray = retrieved;
+    //     previousLayers();
+    // }
+
+});
