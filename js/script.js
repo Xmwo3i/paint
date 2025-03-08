@@ -20,10 +20,10 @@ window.addEventListener("load", function (event) {
     let isDrawing = false;
     let currentRectangle = null;
     let currentCircle;
+    let currentTriangle;
     let startX, startY;
     let endX, endY;
     let shapesArray = [];
-
 
     //add event listener to buttons 
     clear.addEventListener("click", (e)=>{
@@ -38,8 +38,6 @@ window.addEventListener("load", function (event) {
         previousLayers();
     })
 
-
-
     // add event listener to the canvas
     colour.addEventListener("change", (e) => {
         colourSelected = e.target.value;
@@ -51,116 +49,91 @@ window.addEventListener("load", function (event) {
     });
 
     c.addEventListener("mousedown", (e) => {
+        isDrawing = true;
         // position of mouse on canvas
         startX = e.offsetX;
         startY = e.offsetY;
-
-
         //rectangle
         if (shapeSelected === "rectangle") {
-
-            isDrawing = true;
-
-
-
             //create new rec 
             currentRectangle = new Rectangle(startX, startY, 0, 0, colourSelected);
-
-
         }
         else if (shapeSelected === "circle") {
-            isDrawing = true;
-
             // create new circle 
             currentCircle = new Circle(startX, startY, 0, colourSelected);
-
         }
-
+        else if (shapeSelected === "triangle") {
+            //testing traingle
+            currentTriangle = new Triangle(startX, startY, 0, 0, colourSelected);
+        }
     });
 
     c.addEventListener("mousemove", (e) => {
         const currentX = e.offsetX;
         const currentY = e.offsetY;
-
         // width and height 
         sizeX = currentX - startX;
         sizeY = currentY - startY;
 
-        // rectangle 
+        
         if (isDrawing){
-
+            // rectangle 
             if (currentRectangle) {
-
-
                 currentRectangle.width = sizeX;
                 currentRectangle.height = sizeY;
-    
                 // clear the canvas and redraw new one
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
                 currentRectangle.draw();
-    
             }
             //circle 
-            if (currentCircle) {
+            else if (currentCircle) {
                 const radius = Math.sqrt(sizeX ** 2 + sizeY ** 2)
                 currentCircle.radius = radius;
-    
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
-    
                 currentCircle.draw();
             }
+            //triangle
+            else if (currentTriangle) {
+                currentTriangle.width = sizeX*2;
+                currentTriangle.height = sizeY;
+                // clear the canvas and redraw new one
+                ctx.clearRect(0, 0, c.width, c.height);
+                previousLayers();
+                currentTriangle.draw();
+            }
         }
-
     });
     c.addEventListener("mouseup", (e) => {
         endX = e.offsetX;
         endY = e.offsetY;
 
-
         sizeX = endX - startX;
         sizeY = endY - startY;
 
         if (isDrawing) {
-
- 
             isDrawing = false;
- 
             //rectangle
             if (currentRectangle) {
-
                 currentRectangle.draw();
                 shapesArray.push(currentRectangle);
-                //console.log(shapesArray);
-
-
                 currentRectangle = null;
-
-                // push new rectangle to shapes array
             }
-
             //circle 
             if(currentCircle){
                 currentCircle.draw();
                 shapesArray.push(currentCircle);
-
                 currentCircle = null; 
-
+            }
+            //triangle
+            if (currentTriangle) {
+                currentTriangle.draw();
+                shapesArray.push(currentTriangle);
+                currentTriangle = null;
             }
         }
-
-
-
-
-
-
-
-
-
     });
-
-
 
     // add event listeners to buttons
 
@@ -205,6 +178,25 @@ window.addEventListener("load", function (event) {
             ctx.beginPath();
             ctx.fillStyle = this.colour;
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    class Triangle extends Shape {
+        constructor(x, y, width, height, colour) {
+            super(colour);
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+        draw() {
+            ctx.fillStyle = this.colour;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x-this.width/2, this.y+this.height);
+            ctx.lineTo(this.x+this.width/2, this.y+this.height);
             ctx.closePath();
             ctx.fill();
         }
