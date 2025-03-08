@@ -15,8 +15,6 @@ window.addEventListener("load", function (event) {
     let shapeSelected;
     let sizeX;
     let sizeY;
-    let xCoordinate;
-    let yCoordinate;
     let isDrawing = false;
     let currentRectangle = null;
     let currentCircle;
@@ -36,7 +34,7 @@ window.addEventListener("load", function (event) {
         });
     });
     c.addEventListener("mousedown", (e) => {
-        // position of mouse 
+        // position of mouse on canvas
         startX = e.offsetX;
         startY = e.offsetY;
 
