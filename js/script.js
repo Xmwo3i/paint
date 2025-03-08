@@ -15,7 +15,7 @@ window.addEventListener("load", function (event) {
     const undo = this.document.getElementById("undo");
 
     let colourSelected;
-    let shapeSelected;
+    let shapeSelected = "rectangle";
     let sizeX;
     let sizeY;
     let isDrawing = false;
