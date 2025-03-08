@@ -21,7 +21,6 @@ window.addEventListener("load", function (event) {
     let currentRectangle = null;
     let startX, startY;
     let endX, endY;
-    let prevX, prevY, prevWidth, prevHeight; 
     let shapesArray = [];
 
 
@@ -47,12 +46,9 @@ window.addEventListener("load", function (event) {
             //create new rec 
             currentRectangle = new Rectangle(startX, startY, 0, 0, colourSelected);
 
-            //previous rectangle 
-            prevX = startX; 
-            prevY = startY; 
-            prevWidth = 0; 
-            prevHeight = 0; 
+
         }
+    
     });
 
     c.addEventListener("mousemove", (e) => {
@@ -69,16 +65,9 @@ window.addEventListener("load", function (event) {
             currentRectangle.height = sizeY;
 
             // clear the canvas and redraw new one
-            // ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
             ctx.clearRect(0, 0, c.width, c.height);
             previousLayers();
             currentRectangle.draw();
-
-            // prev rectangle
-            prevX = currentRectangle.x;
-            prevY = currentRectangle.y;
-            prevWidth = currentRectangle.width;
-            prevHeight = currentRectangle.height;
 
         }
     });
@@ -99,7 +88,6 @@ window.addEventListener("load", function (event) {
             currentRectangle.width = sizeX;
             currentRectangle.height = sizeY;
 
-            ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
 
             currentRectangle.draw();
             shapesArray.push(currentRectangle);
