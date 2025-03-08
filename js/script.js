@@ -10,9 +10,11 @@ window.addEventListener("load", function (event) {
     const linebutton = this.document.getElementById("line");
     const colour = this.document.getElementById("colour");
     const shapeButtons = this.document.querySelectorAll("button");
+    const clear = this.document.getElementById("clear"); 
+    const undo = this.document.getElementById("undo");
 
     let colourSelected;
-    let buttonSelected;
+    let shapeSelected;
     let sizeX;
     let sizeY;
     let isDrawing = false;
@@ -23,6 +25,20 @@ window.addEventListener("load", function (event) {
     let shapesArray = [];
 
 
+    //add event listener to buttons 
+    clear.addEventListener("click", (e)=>{
+        shapesArray = []; 
+        ctx.clearRect(0 ,0 , c.width, c.height);
+
+    });
+    undo.addEventListener("click", (e)=>{
+        shapesArray.pop();
+        ctx.clearRect(0 ,0 , c.width, c.height);
+        
+        previousLayers();
+    })
+
+
 
     // add event listener to the canvas
     colour.addEventListener("change", (e) => {
@@ -30,16 +46,18 @@ window.addEventListener("load", function (event) {
     });
     shapeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
-            buttonSelected = e.target.id;
+            shapeSelected = e.target.id;
         });
     });
+
     c.addEventListener("mousedown", (e) => {
         // position of mouse on canvas
         startX = e.offsetX;
         startY = e.offsetY;
 
+
         //rectangle
-        if (buttonSelected === "rectangle") {
+        if (shapeSelected === "rectangle") {
 
             isDrawing = true;
 
@@ -50,7 +68,7 @@ window.addEventListener("load", function (event) {
 
 
         }
-        else if (buttonSelected === "circle") {
+        else if (shapeSelected === "circle") {
             isDrawing = true;
 
             // create new circle 
