@@ -22,6 +22,7 @@ window.addEventListener("load", function (event) {
     let startX, startY;
     let endX, endY;
     let prevX, prevY, prevWidth, prevHeight; 
+    let shapesArray = [];
 
 
 
@@ -68,7 +69,9 @@ window.addEventListener("load", function (event) {
             currentRectangle.height = sizeY;
 
             // clear the canvas and redraw new one
-            ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
+            // ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
+            ctx.clearRect(0, 0, c.width, c.height);
+            previousLayers();
             currentRectangle.draw();
 
             // prev rectangle
@@ -90,8 +93,7 @@ window.addEventListener("load", function (event) {
             sizeX = endX - startX;
             sizeY = endY - startY;
 
-            console.log(sizeX);
-            console.log(sizeY);
+     
 
 
             currentRectangle.width = sizeX;
@@ -100,8 +102,13 @@ window.addEventListener("load", function (event) {
             ctx.clearRect(prevX, prevY, prevWidth, prevHeight);
 
             currentRectangle.draw();
+            shapesArray.push(currentRectangle);
+            //console.log(shapesArray);
+            
 
             currentRectangle = null;
+
+            // push new rectangle to shapes array
         }
 
 
@@ -130,6 +137,13 @@ window.addEventListener("load", function (event) {
     });
 
     // add event listeners to buttons
+
+    function previousLayers() {
+        for (let i=0; i<shapesArray.length; i++) {
+            console.log(shapesArray[i]);
+            shapesArray[i].draw();
+        }
+    }
 
 
 
