@@ -12,7 +12,7 @@ window.addEventListener("load", function (event) {
     const shapeButtons = this.document.querySelectorAll("button");
 
     let colourSelected;
-    let shapeSelected;
+    let buttonSelected;
     let sizeX;
     let sizeY;
     let xCoordinate;
@@ -32,7 +32,7 @@ window.addEventListener("load", function (event) {
     });
     shapeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
-            shapeSelected = e.target.id;
+            buttonSelected = e.target.id;
         });
     });
     c.addEventListener("mousedown", (e) => {
@@ -41,7 +41,7 @@ window.addEventListener("load", function (event) {
         startY = e.offsetY;
 
         //rectangle
-        if (shapeSelected === "rectangle") {
+        if (buttonSelected === "rectangle") {
 
             isDrawing = true;
 
@@ -52,7 +52,7 @@ window.addEventListener("load", function (event) {
 
 
         }
-        else if (shapeSelected === "circle") {
+        else if (buttonSelected === "circle") {
             isDrawing = true;
 
             // create new circle 
