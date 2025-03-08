@@ -19,6 +19,7 @@ window.addEventListener("load", function (event) {
     let yCoordinate;
     let isDrawing = false;
     let currentRectangle = null;
+    let currentCircle;
     let startX, startY;
     let endX, endY;
     let shapesArray = [];
@@ -35,99 +36,120 @@ window.addEventListener("load", function (event) {
         });
     });
     c.addEventListener("mousedown", (e) => {
+        // position of mouse 
+        startX = e.offsetX;
+        startY = e.offsetY;
+
         //rectangle
         if (shapeSelected === "rectangle") {
 
             isDrawing = true;
 
-            startX = e.offsetX;
-            startY = e.offsetY;
+
 
             //create new rec 
             currentRectangle = new Rectangle(startX, startY, 0, 0, colourSelected);
 
 
         }
-    
+        else if (shapeSelected === "circle") {
+            isDrawing = true;
+
+            // create new circle 
+            currentCircle = new Circle(startX, startY, 0, colourSelected);
+
+        }
+
     });
 
     c.addEventListener("mousemove", (e) => {
+        const currentX = e.offsetX;
+        const currentY = e.offsetY;
+
+        // width and height 
+        sizeX = currentX - startX;
+        sizeY = currentY - startY;
+
         // rectangle 
-        if (isDrawing && currentRectangle) {
-            const currentX = e.offsetX;
-            const currentY = e.offsetY;
+        if (isDrawing){
 
-            // width and height 
-            sizeX = currentX - startX;
-            sizeY = currentY - startY;
+            if (currentRectangle) {
 
-            currentRectangle.width = sizeX;
-            currentRectangle.height = sizeY;
 
-            // clear the canvas and redraw new one
-            ctx.clearRect(0, 0, c.width, c.height);
-            previousLayers();
-            currentRectangle.draw();
-
+                currentRectangle.width = sizeX;
+                currentRectangle.height = sizeY;
+    
+                // clear the canvas and redraw new one
+                ctx.clearRect(0, 0, c.width, c.height);
+                previousLayers();
+                currentRectangle.draw();
+    
+            }
+            //circle 
+            if (currentCircle) {
+                const radius = Math.sqrt(sizeX ** 2 + sizeY ** 2)
+                currentCircle.radius = radius;
+    
+                ctx.clearRect(0, 0, c.width, c.height);
+                previousLayers();
+    
+                currentCircle.draw();
+            }
         }
+
     });
     c.addEventListener("mouseup", (e) => {
-        //rectangle
-        if (isDrawing && currentRectangle) {
+        endX = e.offsetX;
+        endY = e.offsetY;
+
+
+        sizeX = endX - startX;
+        sizeY = endY - startY;
+
+        if (isDrawing) {
+
+ 
             isDrawing = false;
+ 
+            //rectangle
+            if (currentRectangle) {
 
-            endX = e.offsetX;
-            endY = e.offsetY;
-
-            sizeX = endX - startX;
-            sizeY = endY - startY;
-
-     
-
-
-            currentRectangle.width = sizeX;
-            currentRectangle.height = sizeY;
+                currentRectangle.draw();
+                shapesArray.push(currentRectangle);
+                //console.log(shapesArray);
 
 
-            currentRectangle.draw();
-            shapesArray.push(currentRectangle);
-            //console.log(shapesArray);
-            
+                currentRectangle = null;
 
-            currentRectangle = null;
+                // push new rectangle to shapes array
+            }
 
-            // push new rectangle to shapes array
+            //circle 
+            if(currentCircle){
+                currentCircle.draw();
+                shapesArray.push(currentCircle);
+
+                currentCircle = null; 
+
+            }
         }
+
+
+
+
+
+
 
 
 
     });
 
-    c.addEventListener("click", (e) => {
 
-        xCoordinate = e.offsetX;
-        yCoordinate = e.offsetY;
-
-
-        if (shapeSelected === "triangle") {
-            let triangle = new Triangle();
-            triangle.draw();
-        }
-        if (shapeSelected === "circle") {
-            let circle = new Circle(xCoordinate, yCoordinate, 5, colourSelected);
-            circle.draw();
-        }
-        if (shapeSelected === "line") {
-            let line = new Line();
-            line.draw();
-        }
-
-    });
 
     // add event listeners to buttons
 
     function previousLayers() {
-        for (let i=0; i<shapesArray.length; i++) {
+        for (let i = 0; i < shapesArray.length; i++) {
             console.log(shapesArray[i]);
             shapesArray[i].draw();
         }
