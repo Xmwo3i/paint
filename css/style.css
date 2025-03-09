@@ -21,3 +21,6 @@ body {
     background-color: rgb(228, 228, 228);
     border: 2px solid black;
 }
+input[type=color]{
+    display: none;
+}

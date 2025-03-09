@@ -13,6 +13,7 @@ window.addEventListener("load", function (event) {
     const shapeButtons = this.document.querySelectorAll("button");
     const clear = this.document.getElementById("clear");
     const undo = this.document.getElementById("undo");
+    const paint = this.document.getElementById("paint");
 
     let colourSelected;
     let shapeSelected = "rectangle";
@@ -29,14 +30,15 @@ window.addEventListener("load", function (event) {
 
     // triangle, circle, rectangle, line, brush
     class Shape {
-        constructor(colour) {
+        constructor(colour = "transparent", borderColor = "black") {
             this.colour = colour;
+            this.borderColor = borderColor; 
         }
     }
 
     class Rectangle extends Shape {
-        constructor(x, y, width, height, colour, type="rectangle") {
-            super(colour);
+        constructor(x, y, width, height, colour,borderColor ="black" , type="rectangle") {
+            super(colour, borderColor);
             this.x = x;
             this.y = y;
             this.width = width;
@@ -44,14 +46,18 @@ window.addEventListener("load", function (event) {
             this.type = type;
         }
         draw() {
+            ctx.beginPath();
+            ctx.rect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = this.colour;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fill();
+            ctx.strokeStyle = this.borderColor; 
+            ctx.stroke(); 
         }
     }
 
     class Circle extends Shape {
-        constructor(x, y, radius, colour, type="circle") {
-            super(colour);
+        constructor(x, y, radius, colour, borderColor = "black",  type="circle") {
+            super(colour, borderColor);
             this.x = x;
             this.y = y;
             this.radius = radius;
@@ -60,15 +66,17 @@ window.addEventListener("load", function (event) {
         draw() {
             ctx.beginPath();
             ctx.fillStyle = this.colour;
+            ctx.strokeStyle = this.borderColor; 
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.closePath();
+            ctx.stroke(); 
             ctx.fill();
         }
     }
 
     class Triangle extends Shape {
-        constructor(x, y, width, height, colour, type="triangle") {
-            super(colour);
+        constructor(x, y, width, height, colour,borderColor = "black", type="triangle") {
+            super(colour, borderColor);
             this.x = x;
             this.y = y;
             this.width = width;
@@ -77,18 +85,20 @@ window.addEventListener("load", function (event) {
         }
         draw() {
             ctx.fillStyle = this.colour;
+            ctx.strokeStyle = this.borderColor; 
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
             ctx.lineTo(this.x - this.width / 2, this.y + this.height);
             ctx.lineTo(this.x + this.width / 2, this.y + this.height);
             ctx.closePath();
+            ctx.stroke();
             ctx.fill();
         }
     }
 
     class Line extends Shape {
-        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour, type="line") {
-            super(colour);
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour,borderColor, type="line") {
+            super(colour, borderColor);
             this.xStart = xStart;
             this.yStart = yStart;
             this.xEnd = xEnd;
@@ -170,6 +180,9 @@ window.addEventListener("load", function (event) {
         ctx.clearRect(0, 0, c.width, c.height);
 
         previousLayers();
+    });
+    paint.addEventListener("click", (e)=>{
+        colour.click();
     })
 
     // add event listener to the canvas
@@ -296,6 +309,24 @@ window.addEventListener("load", function (event) {
 
     });
 
+    c.addEventListener("click", (e)=>{
+        const clickedX = e.offsetX; 
+        const clickedY = e.offsetY; 
+
+        // loop through shapes 
+        for (let i = shapesArray.length - 1; i>= 0; i--){
+            let shape = shapesArray[i]; 
+
+            if (ShapeClicked(shape, clickedX, clickedY)){
+                shape.colour = colourSelected; 
+                ctx.clearRect(0, 0, c.width, c.height); 
+                previousLayers();
+                this.localStorage.setItem("shapes", JSON.stringify(shapesArray));
+                break;
+            }
+        }
+    });
+
     // add event listeners to buttons
 
     function previousLayers() {
@@ -304,22 +335,28 @@ window.addEventListener("load", function (event) {
         }
     }
 
-
-
-    
-
-    //local storage
-    // function storage() {
-    //     let storage = JSON.stringify(shapesArray);
-    //     this.localStorage.this.shape = storage;
-    // }
-
-    // function retrieved() {
-    //     //retrieved 
-    //     let retrieved = JSON.parse(this.localStorage.storage);
-    //     console.log(retrieved);
-    //     shapesArray = retrieved;
-    //     previousLayers();
-    // }
-
+    //detect shape clicked
+    function ShapeClicked(shape, x, y) {
+        if (shape instanceof Rectangle) {
+            return x >= shape.x && x <= shape.x + shape.width &&
+                   y >= shape.y && y <= shape.y + shape.height;
+        } 
+        else if (shape instanceof Circle) {
+            const dx = x - shape.x;
+            const dy = y - shape.y;
+            return Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius;
+        } 
+        else if (shape instanceof Triangle) {
+            return (x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
+                    y >= shape.y && y <= shape.y + shape.height);
+        }
+        else if (shape instanceof Line) {
+            const distance = Math.abs((shape.yEnd - shape.yStart) * x - 
+                                     (shape.xEnd - shape.xStart) * y +
+                                     shape.xEnd * shape.yStart - shape.yEnd * shape.xStart) /
+                            Math.sqrt((shape.yEnd - shape.yStart) ** 2 + (shape.xEnd - shape.xStart) ** 2);
+            return distance < 5; // Allow small error margin for line clicks
+        }
+        return false;
+    }
 });
