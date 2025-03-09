@@ -216,7 +216,7 @@ window.addEventListener("load", function (event) {
         }
         else if (buttonSelected === "line") {
             // create new Line 
-            currentLine = new Line(startX, startY, 0, 0, 5);
+            currentLine = new Line(startX, startY, startX,startY, 5);
         }
     });
 
