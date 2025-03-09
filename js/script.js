@@ -97,7 +97,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Line extends Shape {
-        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour,borderColor, type="line") {
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour, borderColor, type="line") {
             super(colour, borderColor);
             this.xStart = xStart;
             this.yStart = yStart;
@@ -366,7 +366,7 @@ window.addEventListener("load", function (event) {
                             Math.sqrt((shape.yEnd - shape.yStart) ** 2 + (shape.xEnd - shape.xStart) ** 2);
             // console.log("line clicked:");
             // console.log(distance < 2);
-            return distance < 2; // Allow small error margin for line clicks
+            return distance < 4; // Allow small error margin for line clicks
         }
         return false;
     }
