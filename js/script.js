@@ -16,7 +16,7 @@ window.addEventListener("load", function (event) {
     const paint = this.document.getElementById("paint");
 
     let colourSelected;
-    let shapeSelected = "rectangle";
+    let buttonSelected = "rectangle";
     let sizeX;
     let sizeY;
     let isDrawing = false;
@@ -30,14 +30,14 @@ window.addEventListener("load", function (event) {
 
     // triangle, circle, rectangle, line, brush
     class Shape {
-        constructor(colour = "transparent", borderColor = "black") {
+        constructor(colour, borderColor = "black") {
             this.colour = colour;
             this.borderColor = borderColor; 
         }
     }
 
     class Rectangle extends Shape {
-        constructor(x, y, width, height, colour = "transparent",borderColor ="black" , type="rectangle") {
+        constructor(x, y, width, height, colour = "transparent",borderColor , type="rectangle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -56,7 +56,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Circle extends Shape {
-        constructor(x, y, radius, colour = "transparent", borderColor = "black",  type="circle") {
+        constructor(x, y, radius, colour = "transparent", borderColor,  type="circle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -75,7 +75,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Triangle extends Shape {
-        constructor(x, y, width, height, colour = "transparent",borderColor = "black", type="triangle") {
+        constructor(x, y, width, height, colour = "transparent",borderColor, type="triangle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -97,7 +97,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Line extends Shape {
-        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour = "transparent",borderColor, type="line") {
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour,borderColor, type="line") {
             super(colour, borderColor);
             this.xStart = xStart;
             this.yStart = yStart;
@@ -191,7 +191,8 @@ window.addEventListener("load", function (event) {
     });
     shapeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
-            shapeSelected = e.target.id;
+            buttonSelected = e.target.id;
+            console.log(buttonSelected);
         });
     });
 
@@ -201,19 +202,19 @@ window.addEventListener("load", function (event) {
         startX = e.offsetX;
         startY = e.offsetY;
         //rectangle
-        if (shapeSelected === "rectangle") {
+        if (buttonSelected === "rectangle") {
             //create new rec 
             currentRectangle = new Rectangle(startX, startY, 0, 0);
         }
-        else if (shapeSelected === "circle") {
+        else if (buttonSelected === "circle") {
             // create new circle 
             currentCircle = new Circle(startX, startY, 0);
         }
-        else if (shapeSelected === "triangle") {
+        else if (buttonSelected === "triangle") {
             //testing traingle
             currentTriangle = new Triangle(startX, startY, 0, 0);
         }
-        else if (shapeSelected === "line") {
+        else if (buttonSelected === "line") {
             // create new Line 
             currentLine = new Line(startX, startY, 0, 0, 5);
         }
@@ -266,7 +267,8 @@ window.addEventListener("load", function (event) {
         }
     });
     c.addEventListener("mouseup", (e) => {
-        console.log(shapesArray);
+        //console.log(shapesArray);
+        console.log("mouse up");
         endX = e.offsetX;
         endY = e.offsetY;
 
@@ -315,10 +317,9 @@ window.addEventListener("load", function (event) {
 
         // loop through shapes 
         for (let i = shapesArray.length - 1; i>= 0; i--){
-            let shape = shapesArray[i]; 
-
-            if (ShapeClicked(shape, clickedX, clickedY)){
-                shape.colour = colourSelected; 
+            if (buttonSelected==="paint" && ShapeClicked(shapesArray[i], clickedX, clickedY)){
+                console.log("clicked " + i);
+                shapesArray[i].colour = colourSelected; 
                 ctx.clearRect(0, 0, c.width, c.height); 
                 previousLayers();
                 this.localStorage.setItem("shapes", JSON.stringify(shapesArray));
@@ -338,23 +339,23 @@ window.addEventListener("load", function (event) {
     //detect shape clicked
     function ShapeClicked(shape, x, y) {
         if (shape instanceof Rectangle) {
-            console.log("rect clicked:");
-            console.log(x >= shape.x && x <= shape.x + shape.width &&
-                y >= shape.y && y <= shape.y + shape.height);
+            // console.log("rect clicked:");
+            // console.log(x >= shape.x && x <= shape.x + shape.width &&
+            //     y >= shape.y && y <= shape.y + shape.height);
             return x >= shape.x && x <= shape.x + shape.width &&
                    y >= shape.y && y <= shape.y + shape.height;
         } 
         else if (shape instanceof Circle) {
             const dx = x - shape.x;
             const dy = y - shape.y;
-            console.log("circle clicked:");
-            console.log(Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius);
+            // console.log("circle clicked:");
+            // console.log(Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius);
             return Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius;
         } 
         else if (shape instanceof Triangle) {
-            console.log("tri clicked:");
-            console.log(x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
-                y >= shape.y && y <= shape.y + shape.height);
+            // console.log("tri clicked:");
+            // console.log(x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
+            //     y >= shape.y && y <= shape.y + shape.height);
             return (x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
                     y >= shape.y && y <= shape.y + shape.height);
         }
@@ -363,9 +364,9 @@ window.addEventListener("load", function (event) {
                                      (shape.xEnd - shape.xStart) * y +
                                      shape.xEnd * shape.yStart - shape.yEnd * shape.xStart) /
                             Math.sqrt((shape.yEnd - shape.yStart) ** 2 + (shape.xEnd - shape.xStart) ** 2);
-            console.log("line clicked:");
-            console.log(distance < 5);
-            return distance < 5; // Allow small error margin for line clicks
+            // console.log("line clicked:");
+            // console.log(distance < 2);
+            return distance < 2; // Allow small error margin for line clicks
         }
         return false;
     }

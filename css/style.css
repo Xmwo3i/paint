@@ -24,3 +24,20 @@ body {
 input[type=color]{
     display: none;
 }
+
+#container{
+    display: flex;
+    flex-direction: row;
+}
+.buttons{
+    display: flex;
+    flex-direction: column;
+    margin-right: 100px;
+    flex-wrap: wrap;
+    
+
+}
+.buttons button{
+    width: 100px;
+    height: 100px;
+}
