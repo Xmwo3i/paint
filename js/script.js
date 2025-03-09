@@ -37,7 +37,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Rectangle extends Shape {
-        constructor(x, y, width, height, colour,borderColor ="black" , type="rectangle") {
+        constructor(x, y, width, height, colour = "transparent",borderColor ="black" , type="rectangle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -56,7 +56,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Circle extends Shape {
-        constructor(x, y, radius, colour, borderColor = "black",  type="circle") {
+        constructor(x, y, radius, colour = "transparent", borderColor = "black",  type="circle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -75,7 +75,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Triangle extends Shape {
-        constructor(x, y, width, height, colour,borderColor = "black", type="triangle") {
+        constructor(x, y, width, height, colour = "transparent",borderColor = "black", type="triangle") {
             super(colour, borderColor);
             this.x = x;
             this.y = y;
@@ -97,7 +97,7 @@ window.addEventListener("load", function (event) {
     }
 
     class Line extends Shape {
-        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour,borderColor, type="line") {
+        constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour = "transparent",borderColor, type="line") {
             super(colour, borderColor);
             this.xStart = xStart;
             this.yStart = yStart;
@@ -203,19 +203,19 @@ window.addEventListener("load", function (event) {
         //rectangle
         if (shapeSelected === "rectangle") {
             //create new rec 
-            currentRectangle = new Rectangle(startX, startY, 0, 0, colourSelected);
+            currentRectangle = new Rectangle(startX, startY, 0, 0);
         }
         else if (shapeSelected === "circle") {
             // create new circle 
-            currentCircle = new Circle(startX, startY, 0, colourSelected);
+            currentCircle = new Circle(startX, startY, 0);
         }
         else if (shapeSelected === "triangle") {
             //testing traingle
-            currentTriangle = new Triangle(startX, startY, 0, 0, colourSelected);
+            currentTriangle = new Triangle(startX, startY, 0, 0);
         }
         else if (shapeSelected === "line") {
             // create new Line 
-            currentLine = new Line(startX, startY, 0, 0, 5, colourSelected);
+            currentLine = new Line(startX, startY, 0, 0, 5);
         }
     });
 
