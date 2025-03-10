@@ -15,6 +15,7 @@ window.addEventListener("load", function (event) {
     const undo = this.document.getElementById("undo");
     const paint = this.document.getElementById("paint");
 
+    // initialize/declare variables
     let colourSelected;
     let buttonSelected = "rectangle";
     let sizeX;
@@ -28,7 +29,7 @@ window.addEventListener("load", function (event) {
     let endX, endY;
     let shapesArray = [];
 
-    // triangle, circle, rectangle, line, brush
+    // Shape constructor (general/parent)
     class Shape {
         constructor(colour, borderColor = "black") {
             this.colour = colour;
@@ -36,6 +37,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
+    // Rectangle constructor
     class Rectangle extends Shape {
         constructor(x, y, width, height, colour = "transparent",borderColor , type="rectangle") {
             super(colour, borderColor);
@@ -55,6 +57,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
+    // Circle constructor
     class Circle extends Shape {
         constructor(x, y, radius, colour = "transparent", borderColor,  type="circle") {
             super(colour, borderColor);
@@ -74,6 +77,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
+    // Triangle constructor
     class Triangle extends Shape {
         constructor(x, y, width, height, colour = "transparent",borderColor, type="triangle") {
             super(colour, borderColor);
@@ -96,6 +100,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
+    // Line constructor
     class Line extends Shape {
         constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour, borderColor, type="line") {
             super(colour, borderColor);
@@ -117,13 +122,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
-    class Brush {
-        constructor(brushShape) {
-            this.brushShape = brushShape;
-        }
-
-    }
-
+    // retrieve and redraw shapes from local storage
     if (this.localStorage.getItem("shapes")) {
         let stringShapesArray= JSON.parse(this.localStorage.getItem("shapes"));
         for (let i=0; i<stringShapesArray.length; i++) {
@@ -168,27 +167,7 @@ window.addEventListener("load", function (event) {
         previousLayers();
     }
 
-
-    //add event listener to buttons 
-    clear.addEventListener("click", (e) => {
-        shapesArray = [];
-        ctx.clearRect(0, 0, c.width, c.height);
-
-    });
-    undo.addEventListener("click", (e) => {
-        shapesArray.pop();
-        ctx.clearRect(0, 0, c.width, c.height);
-
-        previousLayers();
-    });
-    paint.addEventListener("click", (e)=>{
-        colour.click();
-    })
-
-    // add event listener to the canvas
-    colour.addEventListener("change", (e) => {
-        colourSelected = e.target.value;
-    });
+    // add event listeners to each button to change selection
     shapeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
             buttonSelected = e.target.id;
@@ -196,49 +175,69 @@ window.addEventListener("load", function (event) {
         });
     });
 
+    // add event listener to clear button
+    clear.addEventListener("click", (e) => {
+        shapesArray = [];
+        ctx.clearRect(0, 0, c.width, c.height);
+    });
+
+    // add event listener to undo button
+    undo.addEventListener("click", (e) => {
+        shapesArray.pop();
+        ctx.clearRect(0, 0, c.width, c.height);
+        previousLayers();
+    });
+
+    // add event listener to fill/paint button
+    paint.addEventListener("click", (e)=>{
+        colour.click();
+    })
+
+    // add event listener to colour picker when the colour is changed
+    colour.addEventListener("change", (e) => {
+        colourSelected = e.target.value;
+    });
+
+    // on mousedown: create a new shape
     c.addEventListener("mousedown", (e) => {
         isDrawing = true;
         // position of mouse on canvas
         startX = e.offsetX;
         startY = e.offsetY;
-        //rectangle
+        //create new rectangle
         if (buttonSelected === "rectangle") {
-            //create new rec 
             currentRectangle = new Rectangle(startX, startY, 0, 0);
         }
+        // create new circle 
         else if (buttonSelected === "circle") {
-            // create new circle 
             currentCircle = new Circle(startX, startY, 0);
         }
+        //testing triangle
         else if (buttonSelected === "triangle") {
-            //testing traingle
             currentTriangle = new Triangle(startX, startY, 0, 0);
         }
+        // create new Line 
         else if (buttonSelected === "line") {
-            // create new Line 
             currentLine = new Line(startX, startY, startX,startY, 5);
         }
     });
 
+    // on mousemove: update the current shape preview when dragging
     c.addEventListener("mousemove", (e) => {
         const currentX = e.offsetX;
         const currentY = e.offsetY;
-        // width and height 
         sizeX = currentX - startX;
         sizeY = currentY - startY;
-
-
         if (isDrawing) {
-            // rectangle 
+            // update rectangle 
             if (currentRectangle) {
                 currentRectangle.width = sizeX;
                 currentRectangle.height = sizeY;
-                // clear the canvas and redraw new one
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
                 currentRectangle.draw();
             }
-            //circle 
+            // update circle 
             else if (currentCircle) {
                 const radius = Math.sqrt(sizeX ** 2 + sizeY ** 2)
                 currentCircle.radius = radius;
@@ -246,35 +245,32 @@ window.addEventListener("load", function (event) {
                 previousLayers();
                 currentCircle.draw();
             }
-            //triangle
+            // update triangle
             else if (currentTriangle) {
                 currentTriangle.width = sizeX * 2;
                 currentTriangle.height = sizeY;
-                // clear the canvas and redraw new one
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
                 currentTriangle.draw();
             }
-            // line 
+            // update line 
             else if (currentLine) {
                 currentLine.xEnd = currentX;
                 currentLine.yEnd = currentY;
-
                 ctx.clearRect(0, 0, c.width, c.height);
                 previousLayers();
                 currentLine.draw();
             }
         }
     });
+
+    // on mouseup: draw the new shape and add it to the shapes array
     c.addEventListener("mouseup", (e) => {
-        //console.log(shapesArray);
         console.log("mouse up");
         endX = e.offsetX;
         endY = e.offsetY;
-
         sizeX = endX - startX;
         sizeY = endY - startY;
-
         if (isDrawing) {
             isDrawing = false;
             //rectangle
@@ -288,36 +284,31 @@ window.addEventListener("load", function (event) {
                 currentCircle.draw();
                 shapesArray.push(currentCircle);
                 currentCircle = null;
-
             }
             //triangle
             else if (currentTriangle && currentTriangle.width!==0) {
                 currentTriangle.draw();
                 shapesArray.push(currentTriangle);
                 currentTriangle = null;
-
             }
             // line 
             else if (currentLine) {
                 currentLine.draw();
                 shapesArray.push(currentLine);
                 currentLine = null;
-
             }
         }
-
         this.localStorage.setItem("shapes", JSON.stringify(shapesArray));
-
-
     });
 
+    // on click: when fill tool selected, fill the clicked shape
     c.addEventListener("click", (e)=>{
         const clickedX = e.offsetX; 
         const clickedY = e.offsetY; 
-
         // loop through shapes 
         for (let i = shapesArray.length - 1; i>= 0; i--){
-            if (buttonSelected==="paint" && ShapeClicked(shapesArray[i], clickedX, clickedY)){
+            console.log(`Checking shape ${i} at (${clickedX}, ${clickedY})`);
+            if (buttonSelected==="paint" && shapeClicked(shapesArray[i], clickedX, clickedY)){
                 console.log("clicked " + i);
                 shapesArray[i].colour = colourSelected; 
                 ctx.clearRect(0, 0, c.width, c.height); 
@@ -327,35 +318,32 @@ window.addEventListener("load", function (event) {
             }
         }
     });
-
-    // add event listeners to buttons
-
+    
+    /**
+     * Draws all the shapes that were previously created (all the shapes in the array)
+     * @return
+     */
     function previousLayers() {
         for (let i = 0; i < shapesArray.length; i++) {
             shapesArray[i].draw();
         }
     }
 
-    //detect shape clicked
-    function ShapeClicked(shape, x, y) {
+    /**
+     * Detects whether a shape was clicked
+     * @return true or false, depending on whether the shape was clicked
+     */
+    function shapeClicked(shape, x, y) {
         if (shape instanceof Rectangle) {
-            // console.log("rect clicked:");
-            // console.log(x >= shape.x && x <= shape.x + shape.width &&
-            //     y >= shape.y && y <= shape.y + shape.height);
             return x >= shape.x && x <= shape.x + shape.width &&
                    y >= shape.y && y <= shape.y + shape.height;
         } 
         else if (shape instanceof Circle) {
             const dx = x - shape.x;
             const dy = y - shape.y;
-            // console.log("circle clicked:");
-            // console.log(Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius);
             return Math.sqrt(dx ** 2 + dy ** 2) <= shape.radius;
         } 
         else if (shape instanceof Triangle) {
-            // console.log("tri clicked:");
-            // console.log(x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
-            //     y >= shape.y && y <= shape.y + shape.height);
             return (x >= shape.x - shape.width / 2 && x <= shape.x + shape.width / 2 &&
                     y >= shape.y && y <= shape.y + shape.height);
         }
@@ -364,9 +352,7 @@ window.addEventListener("load", function (event) {
                                      (shape.xEnd - shape.xStart) * y +
                                      shape.xEnd * shape.yStart - shape.yEnd * shape.xStart) /
                             Math.sqrt((shape.yEnd - shape.yStart) ** 2 + (shape.xEnd - shape.xStart) ** 2);
-            // console.log("line clicked:");
-            // console.log(distance < 2);
-            return distance < 4; // Allow small error margin for line clicks
+            return distance < 4; // allow small error margin for line clicks
         }
         return false;
     }
