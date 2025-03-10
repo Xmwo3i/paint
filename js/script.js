@@ -36,7 +36,7 @@ window.addEventListener("load", function (event) {
     let endX, endY;
     let shapesArray = [];
 
-    // Shape constructor (general/parent)
+    // Shape class (parent)
     class Shape {
         constructor(colour, borderColor = "black") {
             this.colour = colour;
@@ -44,7 +44,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
-    // Rectangle constructor
+    // Rectangle class
     class Rectangle extends Shape {
         constructor(x, y, width, height, colour = "transparent", borderColor, type = "rectangle") {
             super(colour, borderColor);
@@ -64,7 +64,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
-    // Circle constructor
+    // Circle class
     class Circle extends Shape {
         constructor(x, y, radius, colour = "transparent", borderColor, type = "circle") {
             super(colour, borderColor);
@@ -84,7 +84,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
-    // Triangle constructor
+    // Triangle class
     class Triangle extends Shape {
         constructor(x, y, width, height, colour = "transparent", borderColor, type = "triangle") {
             super(colour, borderColor);
@@ -107,7 +107,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
-    // Line constructor
+    // Line class
     class Line extends Shape {
         constructor(xStart, yStart, xEnd, yEnd, strokeWidth, colour, borderColor, type = "line") {
             super(colour, borderColor);
@@ -117,7 +117,6 @@ window.addEventListener("load", function (event) {
             this.yEnd = yEnd;
             this.strokeWidth = strokeWidth;
             this.type = type;
-
         }
         draw() {
             ctx.beginPath();
@@ -129,6 +128,7 @@ window.addEventListener("load", function (event) {
         }
     }
 
+    // Brush class
     class Brush {
         constructor(x, y, thickness, colour, type = "brush") {
             this.colour = colour
@@ -151,55 +151,14 @@ window.addEventListener("load", function (event) {
 
     }
 
-    if (this.localStorage.getItem("shapes")) {
-        let stringShapesArray = JSON.parse(this.localStorage.getItem("shapes"));
-        for (let i = 0; i < stringShapesArray.length; i++) {
-            console.log(stringShapesArray[i]);
-            if (stringShapesArray[i].type === "rectangle") { // height, width, x, y
-                let tempX = stringShapesArray[i].x;
-                let tempY = stringShapesArray[i].y;
-                let tempHeight = stringShapesArray[i].height;
-                let tempWidth = stringShapesArray[i].width;
-                let tempColour = stringShapesArray[i].colour;
-                let tempRectangle = new Rectangle(tempX, tempY, tempWidth, tempHeight, tempColour);
-                shapesArray.push(tempRectangle);
-            }
-            else if (stringShapesArray[i].type === "circle") {
-                let tempX = stringShapesArray[i].x;
-                let tempY = stringShapesArray[i].y;
-                let tempRadius = stringShapesArray[i].radius;
-                let tempColour = stringShapesArray[i].colour;
-                let tempCircle = new Circle(tempX, tempY, tempRadius, tempColour);
-                shapesArray.push(tempCircle);
-            }
-            else if (stringShapesArray[i].type === "triangle") {
-                let tempX = stringShapesArray[i].x;
-                let tempY = stringShapesArray[i].y;
-                let tempHeight = stringShapesArray[i].height;
-                let tempWidth = stringShapesArray[i].width;
-                let tempColour = stringShapesArray[i].colour;
-                let tempTri = new Triangle(tempX, tempY, tempWidth, tempHeight, tempColour);
-                shapesArray.push(tempTri);
-            }
-            else if (stringShapesArray[i].type === "line") {
-                let tempXstart = stringShapesArray[i].xStart;
-                let tempYstart = stringShapesArray[i].yStart;
-                let tempXend = stringShapesArray[i].xEnd;
-                let tempYend = stringShapesArray[i].yEnd;
-                let tempStroke = stringShapesArray[i].strokeWidth;
-                let tempColour = stringShapesArray[i].colour;
-                let tempLine = new Line(tempXstart, tempYstart, tempXend, tempYend, tempStroke, tempColour);
-                shapesArray.push(tempLine);
-            }
-        }
-        previousLayers();
-    }
+    // retrieve shapes from previous session from local storage
+    retrieveLocalStorage();
 
     // add event listeners to each button to change selection
     shapeButtons.forEach(button => {
         button.addEventListener("click", (e) => {
             buttonSelected = e.target.id;
-            console.log(buttonSelected);
+            //console.log(buttonSelected);
         });
     });
 
@@ -247,12 +206,12 @@ window.addEventListener("load", function (event) {
         else if (buttonSelected === "circle") {
             currentCircle = new Circle(startX, startY, 0);
         }
-        //testing triangle
+        // create new triangle
         else if (buttonSelected === "triangle") {
             currentTriangle = new Triangle(startX, startY, 0, 0);
         }
+        // create new Line 
         else if (shapeSelected === "line") {
-            // create new Line 
             currentLine = new Line(startX, startY, startX, startY, 5);
         }
         else if (shapeSelected === "brush"){
@@ -299,6 +258,7 @@ window.addEventListener("load", function (event) {
                 previousLayers();
                 currentLine.draw();
             }
+            // update brush
             else if (currentBrush){
                 let previousX = startX;
                 let previousY = startY;
@@ -314,7 +274,7 @@ window.addEventListener("load", function (event) {
 
     // on mouseup: draw the new shape and add it to the shapes array
     c.addEventListener("mouseup", (e) => {
-        console.log("mouse up");
+        //console.log("mouse up");
         endX = e.offsetX;
         endY = e.offsetY;
         sizeX = endX - startX;
@@ -355,9 +315,8 @@ window.addEventListener("load", function (event) {
         const clickedY = e.offsetY; 
         // loop through shapes 
         for (let i = shapesArray.length - 1; i>= 0; i--){
-            console.log(`Checking shape ${i} at (${clickedX}, ${clickedY})`);
             if (buttonSelected==="paint" && shapeClicked(shapesArray[i], clickedX, clickedY)){
-                console.log("clicked " + i);
+                //console.log("clicked " + i);
                 shapesArray[i].colour = colourSelected; 
                 ctx.clearRect(0, 0, c.width, c.height); 
                 previousLayers();
@@ -366,6 +325,56 @@ window.addEventListener("load", function (event) {
             }
         }
     });
+
+    /**
+     * Retrieve and draw shapes from local storage
+     * @return
+     */
+    function retrieveLocalStorage() {
+        if (this.localStorage.getItem("shapes")) {
+            let stringShapesArray = JSON.parse(this.localStorage.getItem("shapes"));
+            for (let i = 0; i < stringShapesArray.length; i++) {
+                //console.log(stringShapesArray[i]);
+                if (stringShapesArray[i].type === "rectangle") { // height, width, x, y
+                    let tempX = stringShapesArray[i].x;
+                    let tempY = stringShapesArray[i].y;
+                    let tempHeight = stringShapesArray[i].height;
+                    let tempWidth = stringShapesArray[i].width;
+                    let tempColour = stringShapesArray[i].colour;
+                    let tempRectangle = new Rectangle(tempX, tempY, tempWidth, tempHeight, tempColour);
+                    shapesArray.push(tempRectangle);
+                }
+                else if (stringShapesArray[i].type === "circle") {
+                    let tempX = stringShapesArray[i].x;
+                    let tempY = stringShapesArray[i].y;
+                    let tempRadius = stringShapesArray[i].radius;
+                    let tempColour = stringShapesArray[i].colour;
+                    let tempCircle = new Circle(tempX, tempY, tempRadius, tempColour);
+                    shapesArray.push(tempCircle);
+                }
+                else if (stringShapesArray[i].type === "triangle") {
+                    let tempX = stringShapesArray[i].x;
+                    let tempY = stringShapesArray[i].y;
+                    let tempHeight = stringShapesArray[i].height;
+                    let tempWidth = stringShapesArray[i].width;
+                    let tempColour = stringShapesArray[i].colour;
+                    let tempTri = new Triangle(tempX, tempY, tempWidth, tempHeight, tempColour);
+                    shapesArray.push(tempTri);
+                }
+                else if (stringShapesArray[i].type === "line") {
+                    let tempXstart = stringShapesArray[i].xStart;
+                    let tempYstart = stringShapesArray[i].yStart;
+                    let tempXend = stringShapesArray[i].xEnd;
+                    let tempYend = stringShapesArray[i].yEnd;
+                    let tempStroke = stringShapesArray[i].strokeWidth;
+                    let tempColour = stringShapesArray[i].colour;
+                    let tempLine = new Line(tempXstart, tempYstart, tempXend, tempYend, tempStroke, tempColour);
+                    shapesArray.push(tempLine);
+                }
+            }
+            previousLayers();
+        }
+    }
     
     /**
      * Draws all the shapes that were previously created (all the shapes in the array)
