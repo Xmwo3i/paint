@@ -23,7 +23,7 @@ window.addEventListener("load", function (event) {
 
     // initialize/declare variables
     let colourSelected;
-    let buttonSelected = "rectangle";
+    let buttonSelected = "brush";
     let sizeX;
     let sizeY;
     let isDrawing = false;
@@ -136,12 +136,17 @@ window.addEventListener("load", function (event) {
             this.y = y;
             this.thickness = thickness;
         }
-        draw() {
+        draw(previousX, previousY) {
+            if (previousX === null || previousY === null){
+                return;
+            }
             ctx.beginPath(); 
-            ctx.arc(this.x, this.y, this.thickness / 2, 0, Math.PI*2);
-            ctx.fillStyle = this.colour; 
-            ctx.fill(); 
-            ctx.closePath();
+            ctx.moveTo(previousX, previousY);
+            ctx.lineTo(this.x, this.y);
+            ctx.strokeStyle = this.colour; 
+            ctx.lineWidth = this.thickness; 
+            ctx.lineCap = "round"; 
+            ctx.stroke();
         }
 
     }
@@ -294,11 +299,16 @@ window.addEventListener("load", function (event) {
                 previousLayers();
                 currentLine.draw();
             }
-            else if (currentBrush)
-                currentBrush.x = currentX; 
-                currentBrush.y = currentY; 
-                currentBrush.draw();
+            else if (currentBrush){
+                let previousX = startX;
+                let previousY = startY;
+                startX = currentX; 
+                startY = currentY;
+                let currentBrush = new Brush(startX, startY, 5, colourSelected); 
+
+                currentBrush.draw(previousX, previousY);
                 shapesArray.push(currentBrush); 
+            }
         }
     });
 
